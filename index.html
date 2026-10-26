@@ -1,0 +1,50 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPNBIHAR News Studio</title>
+  </head>
+  <body>
+    <div id="studio">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">GP</span>
+          <div>
+            <h1>GPNBIHAR <span>NEWS</span></h1>
+            <p>LIVE NEWS STUDIO</p>
+          </div>
+        </div>
+        <div class="recording-status">
+          <span class="status-dot"></span>
+          RECORDING
+        </div>
+      </header>
+
+      <main class="studio-layout">
+        <section class="anchor-panel">
+          <div class="panel-label">ANCHOR</div>
+          <div id="anchor-tile" class="video-tile anchor-tile">
+            <div class="placeholder">Waiting for anchor...</div>
+          </div>
+          <div class="nameplate">GPNBIHAR NEWS</div>
+        </section>
+
+        <aside class="guests-panel">
+          <div class="panel-label">GUESTS</div>
+          <div id="guest-grid" class="guest-grid">
+            <div class="guest-empty">Waiting for guests...</div>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="footer">
+        <span>GPNBIHAR NEWS STUDIO</span>
+        <span id="connection-status">Connecting to studio...</span>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
