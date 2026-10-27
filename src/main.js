@@ -194,40 +194,48 @@ room.on(RoomEvent.Disconnected, () => {
   // recordingStarted = false;
 });
 
+
 async function startStudio() {
-  const url = EgressHelper.getLiveKitURL();
-  const token = EgressHelper.getAccessToken();
-
-  if (!url || !token) {
-    connectionStatus.textContent =
-      "Waiting for LiveKit recording parameters";
-    console.info("Open this page through LiveKit Egress to supply its URL and token.");
-    return;
-  }
-
   try {
+    const url = EgressHelper.getLiveKitURL();
+    const token = EgressHelper.getAccessToken();
+
+    console.info("[template] URL present:", Boolean(url));
+    console.info("[template] Token present:", Boolean(token));
+
+    if (!url || !token) {
+      throw new Error("Missing LiveKit URL or recorder token");
+    }
+
     connectionStatus.textContent = "Connecting to LiveKit...";
 
     await room.connect(url, token);
+    console.info("[template] Connected to room:", room.name);
+
     EgressHelper.setRoom(room);
 
     registerParticipant(room.localParticipant);
-
-    room.remoteParticipants.forEach((participant) => {
-      registerParticipant(participant);
-    });
+    room.remoteParticipants.forEach(registerParticipant);
 
     connectionStatus.textContent = "Studio connected";
 
-    // Allow the browser time to paint the initial studio layout.
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await new Promise((resolve) =>
+      requestAnimationFrame(resolve)
+    );
+    await new Promise((resolve) =>
+      requestAnimationFrame(resolve)
+    );
 
-    EgressHelper.startRecording();
+    console.info("[egress-debug] Connected:", room.state);
+    console.info("[egress-debug] Sending native start signal");
+
+    // Temporary diagnostic: replace the SDK call; do not call both.
+    console.log("START_RECORDING");
+
     recordingStarted = true;
-    console.info("GPNBIHAR studio layout ready; recording signal sent.");
+    console.info("[egress-debug] Native start signal emitted");
   } catch (error) {
-    console.error("Could not start the recording template:", error);
+    console.error("[template] Startup failed:", error);
     connectionStatus.textContent = "Connection failed — check logs";
   }
 }
