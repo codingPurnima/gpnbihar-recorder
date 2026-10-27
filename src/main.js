@@ -1,7 +1,10 @@
 
 import { Room, RoomEvent, Track } from "livekit-client";
-import EgressHelper from "@livekit/egress-sdk";
 import "./style.css";
+import EgressHelperImport from "@livekit/egress-sdk";
+
+const EgressHelper =
+  EgressHelperImport.default ?? EgressHelperImport;
 
 const anchorTile = document.getElementById("anchor-tile");
 const guestGrid = document.getElementById("guest-grid");
@@ -182,14 +185,13 @@ room.on(RoomEvent.TrackUnpublished, (publication) => {
 room.on(RoomEvent.Disconnected, () => {
   connectionStatus.textContent = "Studio disconnected";
 
-  // if (recordingStarted) {
-  //   EgressHelper.endRecording();
-  //   recordingStarted = false;
-  // }
   if (recordingStarted) {
-  console.log("END_RECORDING");
-  recordingStarted = false;
-}
+    EgressHelper.endRecording();
+    recordingStarted = false;
+  }
+  // if (recordingStarted) {
+  // console.log("END_RECORDING");
+  // recordingStarted = false;
 });
 
 async function startStudio() {
@@ -221,12 +223,9 @@ async function startStudio() {
     await new Promise((resolve) => requestAnimationFrame(resolve));
     await new Promise((resolve) => requestAnimationFrame(resolve));
 
-    // EgressHelper.startRecording();
-    // recordingStarted = true;
-    // console.info("GPNBIHAR studio layout ready; recording signal sent.");
-    console.info("GPNBIHAR studio layout ready");
-    console.log("START_RECORDING");
+    EgressHelper.startRecording();
     recordingStarted = true;
+    console.info("GPNBIHAR studio layout ready; recording signal sent.");
   } catch (error) {
     console.error("Could not start the recording template:", error);
     connectionStatus.textContent = "Connection failed — check logs";
