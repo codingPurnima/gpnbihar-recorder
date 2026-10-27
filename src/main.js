@@ -1,15 +1,6 @@
-
 import { Room, RoomEvent, Track } from "livekit-client";
 import "./style.css";
-import { EgressHelper } from '@livekit/egress-sdk';
-
-// This automatically reads the query parameters injected by LiveKit Egress worker
-EgressHelper.onStart((event) => {
-  console.log("Egress started with config:", event);
-});
-
-// Handle ready state if required by your template layout
-EgressHelper.ready();
+import EgressHelper from '@livekit/egress-sdk';
 
 const anchorTile = document.getElementById("anchor-tile");
 const guestGrid = document.getElementById("guest-grid");
@@ -23,6 +14,27 @@ const room = new Room({
 
 const participants = new Map();
 let recordingStarted = false;
+
+// Robust parameter extractor as a safeguard against Vite/CJS build bundling issues
+function getEgressParams() {
+  const params = new URLSearchParams(window.location.search);
+  let url = params.get("url");
+  let token = params.get("token");
+
+  // Fallback to EgressHelper if available
+  try {
+    if (!url && typeof EgressHelper.getLiveKitURL === "function") {
+      url = EgressHelper.getLiveKitURL();
+    }
+    if (!token && typeof EgressHelper.getAccessToken === "function") {
+      token = EgressHelper.getAccessToken();
+    }
+  } catch (e) {
+    console.warn("[template] EgressHelper methods unavailable, using URLSearchParams directly:", e);
+  }
+
+  return { url, token };
+}
 
 function makePlaceholder(message) {
   const placeholder = document.createElement("div");
@@ -98,7 +110,6 @@ function renderParticipants() {
       participant.identity !== room.localParticipant.identity
   );
 
-  // The anchor gets the larger tile.
   anchorTile.replaceChildren();
 
   if (anchor) {
@@ -191,27 +202,28 @@ room.on(RoomEvent.Disconnected, () => {
   connectionStatus.textContent = "Studio disconnected";
 
   if (recordingStarted) {
-    EgressHelper.endRecording();
+    try {
+      if (typeof EgressHelper.endRecording === "function") {
+        EgressHelper.endRecording();
+      } else {
+        console.log("END_RECORDING");
+      }
+    } catch (e) {
+      console.log("END_RECORDING");
+    }
     recordingStarted = false;
   }
-  // if (recordingStarted) {
-  // console.log("END_RECORDING");
-  // recordingStarted = false;
 });
-
 
 async function startStudio() {
   try {
-    const url = EgressHelper.getLiveKitURL();
-    const token = EgressHelper.getAccessToken();
+    const { url, token } = getEgressParams();
 
     console.info("[template] URL present:", Boolean(url));
     console.info("[template] Token present:", Boolean(token));
 
-    console.info("[egress-debug] URL present:", Boolean(url));
-    console.info("[egress-debug] Token present:", Boolean(token));
     if (!url || !token) {
-      throw new Error("Missing LiveKit URL or recorder token");
+      throw new Error("Missing LiveKit URL or recorder token in query string");
     }
 
     connectionStatus.textContent = "Connecting to LiveKit...";
@@ -219,29 +231,40 @@ async function startStudio() {
     await room.connect(url, token);
     console.info("[template] Connected to room:", room.name);
 
-    EgressHelper.setRoom(room);
+    try {
+      if (typeof EgressHelper.setRoom === "function") {
+        EgressHelper.setRoom(room);
+      }
+    } catch (e) {
+      console.warn("EgressHelper.setRoom failed:", e);
+    }
 
     registerParticipant(room.localParticipant);
     room.remoteParticipants.forEach(registerParticipant);
 
     connectionStatus.textContent = "Studio connected";
 
-    await new Promise((resolve) =>
-      requestAnimationFrame(resolve)
-    );
-    await new Promise((resolve) =>
-      requestAnimationFrame(resolve)
-    );
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
 
     console.info("[egress-debug] Room connected:", room.state);
     console.info("[egress-debug] Layout rendered");
 
-    EgressHelper.startRecording();
+    // Signal start recording to move Egress worker from STARTING to ACTIVE
+    try {
+      if (typeof EgressHelper.startRecording === "function") {
+        EgressHelper.startRecording();
+      } else {
+        console.log("START_RECORDING");
+      }
+    } catch (e) {
+      console.log("START_RECORDING");
+    }
 
     recordingStarted = true;
     connectionStatus.textContent = "Recording signal sent";
 
-    console.info("[egress-debug] EgressHelper.startRecording() called");
+    console.info("[egress-debug] Recording signal successfully sent");
 
   } catch (error) {
     console.error("[template] Startup failed:", error);
