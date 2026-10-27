@@ -1,10 +1,15 @@
 
 import { Room, RoomEvent, Track } from "livekit-client";
 import "./style.css";
-import EgressHelperImport from "@livekit/egress-sdk";
+import { EgressHelper } from '@livekit/egress-sdk';
 
-const EgressHelper =
-  EgressHelperImport.default ?? EgressHelperImport;
+// This automatically reads the query parameters injected by LiveKit Egress worker
+EgressHelper.onStart((event) => {
+  console.log("Egress started with config:", event);
+});
+
+// Handle ready state if required by your template layout
+EgressHelper.ready();
 
 const anchorTile = document.getElementById("anchor-tile");
 const guestGrid = document.getElementById("guest-grid");
@@ -237,7 +242,7 @@ async function startStudio() {
     connectionStatus.textContent = "Recording signal sent";
 
     console.info("[egress-debug] EgressHelper.startRecording() called");
-    
+
   } catch (error) {
     console.error("[template] Startup failed:", error);
     connectionStatus.textContent = "Connection failed — check logs";
