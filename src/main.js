@@ -203,6 +203,8 @@ async function startStudio() {
     console.info("[template] URL present:", Boolean(url));
     console.info("[template] Token present:", Boolean(token));
 
+    console.info("[egress-debug] URL present:", Boolean(url));
+    console.info("[egress-debug] Token present:", Boolean(token));
     if (!url || !token) {
       throw new Error("Missing LiveKit URL or recorder token");
     }
@@ -226,14 +228,16 @@ async function startStudio() {
       requestAnimationFrame(resolve)
     );
 
-    console.info("[egress-debug] Connected:", room.state);
-    console.info("[egress-debug] Sending native start signal");
+    console.info("[egress-debug] Room connected:", room.state);
+    console.info("[egress-debug] Layout rendered");
 
-    // Temporary diagnostic: replace the SDK call; do not call both.
+    // Important: this exact string must be logged.
     console.log("START_RECORDING");
 
     recordingStarted = true;
-    console.info("[egress-debug] Native start signal emitted");
+    connectionStatus.textContent = "Recording signal sent";
+
+    console.info("[egress-debug] START_RECORDING emitted");
   } catch (error) {
     console.error("[template] Startup failed:", error);
     connectionStatus.textContent = "Connection failed — check logs";
