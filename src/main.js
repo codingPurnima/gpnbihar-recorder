@@ -1,3 +1,4 @@
+// CURRENT WORKING VERSION FOR TWO PEOPLE 
 import { Room, RoomEvent, Track } from "livekit-client";
 import "./style.css";
 import EgressHelper from '@livekit/egress-sdk';
