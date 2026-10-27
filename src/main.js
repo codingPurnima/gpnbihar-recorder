@@ -231,13 +231,13 @@ async function startStudio() {
     console.info("[egress-debug] Room connected:", room.state);
     console.info("[egress-debug] Layout rendered");
 
-    // Important: this exact string must be logged.
-    console.log("START_RECORDING");
+    EgressHelper.startRecording();
 
     recordingStarted = true;
     connectionStatus.textContent = "Recording signal sent";
 
-    console.info("[egress-debug] START_RECORDING emitted");
+    console.info("[egress-debug] EgressHelper.startRecording() called");
+    
   } catch (error) {
     console.error("[template] Startup failed:", error);
     connectionStatus.textContent = "Connection failed — check logs";
