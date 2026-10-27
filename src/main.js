@@ -182,10 +182,14 @@ room.on(RoomEvent.TrackUnpublished, (publication) => {
 room.on(RoomEvent.Disconnected, () => {
   connectionStatus.textContent = "Studio disconnected";
 
+  // if (recordingStarted) {
+  //   EgressHelper.endRecording();
+  //   recordingStarted = false;
+  // }
   if (recordingStarted) {
-    EgressHelper.endRecording();
-    recordingStarted = false;
-  }
+  console.log("END_RECORDING");
+  recordingStarted = false;
+}
 });
 
 async function startStudio() {
@@ -217,9 +221,12 @@ async function startStudio() {
     await new Promise((resolve) => requestAnimationFrame(resolve));
     await new Promise((resolve) => requestAnimationFrame(resolve));
 
-    EgressHelper.startRecording();
-    recordingStarted = true;
-    console.info("GPNBIHAR studio layout ready; recording signal sent.");
+    // EgressHelper.startRecording();
+    // recordingStarted = true;
+    // console.info("GPNBIHAR studio layout ready; recording signal sent.");
+    console.info("GPNBIHAR studio layout ready");
+    console.log("START_RECORDING");
+    rcordingStarted = true;
   } catch (error) {
     console.error("Could not start the recording template:", error);
     connectionStatus.textContent = "Connection failed — check logs";
