@@ -226,7 +226,7 @@ async function startStudio() {
     // console.info("GPNBIHAR studio layout ready; recording signal sent.");
     console.info("GPNBIHAR studio layout ready");
     console.log("START_RECORDING");
-    rcordingStarted = true;
+    recordingStarted = true;
   } catch (error) {
     console.error("Could not start the recording template:", error);
     connectionStatus.textContent = "Connection failed — check logs";
